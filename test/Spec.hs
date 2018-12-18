@@ -18,75 +18,38 @@ packTests :: TestTree
 packTests = testGroup "Pack Tests" [packActionTests]
 
 packActionTests :: TestTree
-packActionTests =
-  testGroup "Action Tests" [packProjectionTests, packValidationTests]
+packActionTests = testGroup "Action Tests" [handlePackEventTests]
 
 testCardList =
-  [ (Card "Axe" 0)
-  , (Card "Cunning Plan" 1)
-  , (Card "Cunning Plan" 1)
-  , (Card "Selfish Cleric" 2)
+  [ (Card "Axe")
+  , (Card "Cunning Plan")
+  , (Card "Cunning Plan")
+  , (Card "Selfish Cleric")
   ]
 
-packProjectionTests :: TestTree
-packProjectionTests =
+handlePackEventTests :: TestTree
+handlePackEventTests =
   testGroup "Projection Tests" $
-  [ testCase "Projecting PickA removes two cards from the Snapshot." $
-    packProjection
-      (PackSnapshot
-         [ (Card "Axe" 0)
-         , (Card "Bronze Legionnaire" 1)
-         , (Card "Cunning Plan" 1)
-         , (Card "Selfish Cleric" 2)
+  [ testCase "Processing Picked removes two cards from the pack." $
+    handlePackEvent
+      (Pack
+         [ (Card "Axe")
+         , (Card "Bronze Legionnaire")
+         , (Card "Cunning Plan")
+         , (Card "Selfish Cleric")
          ])
-      [PickA (Card "Axe" 0) (Card "Bronze Legionnaire" 1)] @?=
-    PackSnapshot [(Card "Cunning Plan" 1), (Card "Selfish Cleric" 2)]
-  , testCase "Projecting TransformA removes a card, replacing it with another." $
-    packProjection
-      (PackSnapshot testCardList)
-      [TransformA (Card "Cunning Plan" 1) (Card "Drow Ranger" 5)] @?=
-    PackSnapshot
-      [ (Card "Drow Ranger" 5)
-      , (Card "Axe" 0)
-      , (Card "Cunning Plan" 1)
-      , (Card "Selfish Cleric" 2)
+      (Picked (Card "Axe") (Card "Bronze Legionnaire")) @?=
+    Pack [(Card "Cunning Plan"), (Card "Selfish Cleric")]
+  , testCase "Processing Transformed removes a card, replacing it with another." $
+    handlePackEvent
+      (Pack testCardList)
+      (Transformed (Card "Cunning Plan") (Card "Drow Ranger")) @?=
+    Pack
+      [ (Card "Drow Ranger")
+      , (Card "Axe")
+      , (Card "Cunning Plan")
+      , (Card "Selfish Cleric")
       ]
-  , testCase "Projecting InitializeA sets the pack to the specified cards." $
-    packProjection packSeed [(InitializeA testCardList)] @?=
-    PackSnapshot testCardList
+  , testCase "Processing Initialized sets the pack to the specified cards." $
+    handlePackEvent (Pack []) (Initialized testCardList) @?= Pack testCardList
   ]
-
-packValidationTests :: TestTree
-packValidationTests =
-  testGroup
-    "Validation Tests"
-    [ testCase "User command validation creates a valid Pick action." $
-      processPackUserCommand
-        (PackSnapshot testCardList)
-        (Pick (Card "Axe" 0) (Card "Cunning Plan" 1)) @?=
-      Just (PickA (Card "Axe" 0) (Card "Cunning Plan" 1))
-    , testCase
-        "User command validation fails on a Pick action if the cards aren't in the pack." $
-      processPackUserCommand
-        (PackSnapshot testCardList)
-        (Pick (Card "Drow Ranger" 5) (Card "Cunning Plan" 1)) @?=
-      Nothing
-    , testCase "Server command validation creates a valid Initialize action." $
-      processPackServerCommand (PackSnapshot []) (Initialize testCardList) @?=
-      Just (InitializeA testCardList)
-    , testCase
-        "Server command validation fails on an Initialize action if the pack isn't empty." $
-      processPackServerCommand (PackSnapshot testCardList) (Initialize []) @?=
-      Nothing
-    , testCase "Server command validation creates a valid Transform action." $
-      processPackServerCommand
-        (PackSnapshot testCardList)
-        (Transform (Card "Cunning Plan" 1) (Card "Drow Ranger" 5)) @?=
-      Just (TransformA (Card "Cunning Plan" 1) (Card "Drow Ranger" 5))
-    , testCase
-        "Server command validation fails on a Transform action if the card to be transformed isn't in the pack." $
-      processPackServerCommand
-        (PackSnapshot testCardList)
-        (Transform (Card "Drow Ranger" 5) (Card "Axe" 0)) @?=
-      Nothing
-    ]

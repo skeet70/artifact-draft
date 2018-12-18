@@ -34,7 +34,13 @@ resolver: lts-12.22
 #  - auto-update
 #  - wai
 packages:
-- .
+  - .
+  - location:
+      git: jdreaver/eventful
+      commit: master
+      subdirs:
+        - eventful-core
+        - eventful-memory
 # Dependency packages to be pulled from upstream that are not in the resolver
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)

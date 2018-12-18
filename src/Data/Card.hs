@@ -6,5 +6,4 @@ import Data.Text (Text)
 -- TODO: seed database with response, or setup something to poll it regularly?
 data Card = Card
   { cardName :: Text
-  , cardId :: Int
   } deriving (Eq, Show)

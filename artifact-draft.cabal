@@ -21,6 +21,7 @@ library
                      , eventful-core
                      , eventful-memory
                      , servant-server
+                     , stm
                      , text
                      , wai
                      , warp
