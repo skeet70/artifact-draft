@@ -49,17 +49,17 @@ packProjection (PackSnapshot cards) ((PickA c1 c2):actions) =
 packProjection (PackSnapshot cards) ((TransformA c1 c2):actions) =
   packProjection (PackSnapshot (c2 : delete c1 cards)) actions
 
-validatePackServerCommand ::
+processPackServerCommand ::
      PackSnapshot -> PackServerCommand -> Maybe PackAction
-validatePackServerCommand (PackSnapshot []) (Initialize cards) =
+processPackServerCommand (PackSnapshot []) (Initialize cards) =
   Just $ InitializeA cards
-validatePackServerCommand (PackSnapshot cards) (Transform c1 c2)
+processPackServerCommand (PackSnapshot cards) (Transform c1 c2)
   | c1 `elem` cards = Just $ TransformA c1 c2
   | otherwise = Nothing
-validatePackServerCommand _ _ = Nothing
+processPackServerCommand _ _ = Nothing
 
 -- this likely needs the user's pool information too, to ensure they haven't already picked a hero this round.
-validatePackUserCommand :: PackSnapshot -> PackUserCommand -> Maybe PackAction
-validatePackUserCommand (PackSnapshot cards) (Pick c1 c2)
+processPackUserCommand :: PackSnapshot -> PackUserCommand -> Maybe PackAction
+processPackUserCommand (PackSnapshot cards) (Pick c1 c2)
   | (c1 `elem` cards) && (c2 `elem` cards) = Just $ PickA c1 c2
   | otherwise = Nothing

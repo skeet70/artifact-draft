@@ -61,31 +61,31 @@ packValidationTests =
   testGroup
     "Validation Tests"
     [ testCase "User command validation creates a valid Pick action." $
-      validatePackUserCommand
+      processPackUserCommand
         (PackSnapshot testCardList)
         (Pick (Card "Axe" 0) (Card "Cunning Plan" 1)) @?=
       Just (PickA (Card "Axe" 0) (Card "Cunning Plan" 1))
     , testCase
         "User command validation fails on a Pick action if the cards aren't in the pack." $
-      validatePackUserCommand
+      processPackUserCommand
         (PackSnapshot testCardList)
         (Pick (Card "Drow Ranger" 5) (Card "Cunning Plan" 1)) @?=
       Nothing
     , testCase "Server command validation creates a valid Initialize action." $
-      validatePackServerCommand (PackSnapshot []) (Initialize testCardList) @?=
+      processPackServerCommand (PackSnapshot []) (Initialize testCardList) @?=
       Just (InitializeA testCardList)
     , testCase
         "Server command validation fails on an Initialize action if the pack isn't empty." $
-      validatePackServerCommand (PackSnapshot testCardList) (Initialize []) @?=
+      processPackServerCommand (PackSnapshot testCardList) (Initialize []) @?=
       Nothing
     , testCase "Server command validation creates a valid Transform action." $
-      validatePackServerCommand
+      processPackServerCommand
         (PackSnapshot testCardList)
         (Transform (Card "Cunning Plan" 1) (Card "Drow Ranger" 5)) @?=
       Just (TransformA (Card "Cunning Plan" 1) (Card "Drow Ranger" 5))
     , testCase
         "Server command validation fails on a Transform action if the card to be transformed isn't in the pack." $
-      validatePackServerCommand
+      processPackServerCommand
         (PackSnapshot testCardList)
         (Transform (Card "Drow Ranger" 5) (Card "Axe" 0)) @?=
       Nothing
