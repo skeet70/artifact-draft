@@ -3,7 +3,7 @@ version:             0.1.0.0
 -- synopsis:
 -- description:
 homepage:            https://github.com/skeet70/artifact-draft#readme
-license:             BSD3
+license:             MIT
 license-file:        LICENSE
 author:              Murph Murphy
 maintainer:          murph@clurictec.com
@@ -15,14 +15,18 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Data.Card, Data.Pack
+  exposed-modules:     Data.Card, Data.Pack, Data.Draft
   build-depends:       base >= 4.7 && < 5
                      , aeson
+                     , containers
                      , eventful-core
                      , eventful-memory
+                     , random
                      , servant-server
                      , stm
                      , text
+                     , vector
+                     , vector-shuffling
                      , wai
                      , warp
   default-language:    Haskell2010
@@ -43,6 +47,8 @@ test-suite artifact-draft-test
   main-is:             Spec.hs
   build-depends:       base
                      , artifact-draft
+                     , containers
+                     , eventful-core
                      , tasty
                      , tasty-hunit
                      , tasty-quickcheck

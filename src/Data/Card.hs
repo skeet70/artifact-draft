@@ -1,5 +1,8 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Data.Card where
 
+import Data.Aeson
 import Data.Text (Text)
 
 -- TODO: expand to encompass the Artifact CardSet API response.
