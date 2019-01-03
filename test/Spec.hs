@@ -80,14 +80,12 @@ handleDraftEventTests :: TestTree
 handleDraftEventTests =
   testGroup "handleDraftEvent Tests" $
   [ testCase "Processing PackPassed moves the pack to the next user." $ do
-      let initializedDraft =
-            latestProjection
-              draftProjection
-              [D.Initialized testUsersList testPacksList, RoundIncremented]
+      let initialEvents = [D.Initialized testUsersList testPacksList, RoundIncremented]
+          initializedDraft = latestProjection draftProjection initialEvents
           firstUser = head $ draftPositions initializedDraft
           firstPack = head $ ((draftState initializedDraft) ! firstUser)
           secondUser = (draftPositions initializedDraft) !! 1
-          events = [PackPassed firstUser firstPack]
+          events = initialEvents ++ [PackPassed firstUser firstPack]
           state = draftState $ latestProjection draftProjection events
           secondUsersPack = last (state ! secondUser)
       secondUsersPack @?= firstPack
